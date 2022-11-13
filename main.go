@@ -3,9 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/michaelrknutson/loanprogo/database"
+	"github.com/michaelrknutson/loanprogo/initializers"
+	"github.com/michaelrknutson/loanprogo/middleware"
 	"github.com/michaelrknutson/loanprogo/models"
 	"github.com/michaelrknutson/loanprogo/operation"
 	records "github.com/michaelrknutson/loanprogo/record"
@@ -18,14 +22,22 @@ import (
 func setupRoutes(app *fiber.App) {
 	app.Get("/api/v1/users", users.GetUsers)
 	app.Get("/api/v1/users/:id", users.GetUser)
+	app.Get("/api/v1/users/validate", users.Validate)
 	app.Post("/api/v1/users/", users.CreateUser)
 	app.Post("/api/v1/users/login", users.LoginUser)
-	app.Put("/api/v1/users/:id", users.UpdateUser)
+	app.Post("/api/v1/users/:id/logout", middleware.RequireAuth(), users.LogoutUser)
+	app.Put("/api/v1/users/:id", middleware.RequireAuth(), users.UpdateUser)
 	app.Delete("/api/v1/users/:id", users.DeleteUser)
 	app.Post("/api/v1/operation/seedthedb", operation.SeedOperations)
-	app.Get("/api/v1/:userid/records", records.GetRecords)
-	app.Post("/api/v1/:userid/:operationid/records", records.CreateRecord)
-	app.Delete("/api/v1/:userid/records/:id", records.DeleteRecord)
+	app.Get("/api/v1/:userid/records", middleware.RequireAuth(), records.GetRecords)
+	app.Get("/api/v1/validate", users.Validate)
+	app.Get("/api/v1/:id/auth/validate_token", middleware.RequireAuth(), users.ValidateToken)
+	app.Post("/api/v1/:userid/:operationid/records", middleware.RequireAuth(), records.CreateRecord)
+	app.Delete("/api/v1/:userid/records/:id", middleware.RequireAuth(), records.DeleteRecord)
+}
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 }
 
 func initDatabase() {
@@ -40,9 +52,16 @@ func initDatabase() {
 	fmt.Print("Database Migrated")
 }
 
+func init() {
+	initializers.LoadEnvVariables()
+}
+
 func main() {
 	app := fiber.New()
 	initDatabase()
+
+	app.Use(cors.New())
+	// app.Use(middleware.RequireAuth)
 
 	setupRoutes(app)
 

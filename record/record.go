@@ -48,7 +48,7 @@ func checkOperation(operation models.Operation, balance float64, firstNumber flo
 func generateStrings() (randomString string) {
 	response, err := http.Get("https://www.random.org/strings/?num=1&len=16&digits=on&upperalpha=on&loweralpha=on&unique=on&format=plain&rnd=new")
 	if err != nil {
-		randomString = randomstring.Generate(16)
+		randomString = randomstring.Generate(12)
 		fmt.Print(err.Error())
 		os.Exit(1)
 	}
@@ -137,11 +137,11 @@ func DeleteRecord(c *fiber.Ctx) error {
 	database.DBConn.Raw("SELECT * FROM records WHERE user_refer = $1 AND id = $2",
 		userId, recordId).Scan(&record)
 
-	t := time.Time(time.Now())
+	t := time.Now()
 	record.DeletedTime = t
 	if err = database.DBConn.Save(&record).Error; err != nil {
 		c.Status(400).Send([]byte(err.Error()))
 	}
 
-	return c.SendString("Record Deleted")
+	return c.Status(fiber.StatusOK).JSON(record)
 }
