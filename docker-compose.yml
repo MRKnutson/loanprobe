@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+  api:
+    container_name: loanpro_api
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      loanpro_db:
+        condition: service_healthy
+    environment:
+      POSTGRES_DB: loanpro
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+
+  loanpro_db:
+    image: postgres:15
+    platform: linux/x86_64
+    container_name: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: loanpro
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d{POSTGRES_DB}"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+
+volumes:
+  postgres:
+    name: go-db

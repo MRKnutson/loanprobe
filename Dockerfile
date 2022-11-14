@@ -1,13 +1,15 @@
-FROM golang:latest
+FROM golang:1.19
 
-RUN mkdir /build
-WORKDIR /build
+WORKDIR /app
 
-RUN export GO111MODULE=on
-RUN go get github.com/michaelrknutson/loanprogo
-RUN cd /build && git clone https://github.com/michaelrknutson/loanprobe.git
+# RUN apk update && apk add libc-dev && apk add gcc && apk add make
 
-RUN cd /build/loanprogo && go build
-EXPOSE 8080
+COPY . .
 
-ENTRYPOINT [ "/build/loanprogo/main" ]
+RUN go mod download && go mod verify
+
+ENV go env -w GO111MODULE=off
+
+RUN go build -o bin/server main.go
+
+CMD ["./bin/server"]
