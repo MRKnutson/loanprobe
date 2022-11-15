@@ -12,10 +12,7 @@ services:
     depends_on:
       loanpro_db:
         condition: service_healthy
-    environment:
-      POSTGRES_DB: loanpro
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+
 
   loanpro_db:
     image: postgres:15

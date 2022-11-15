@@ -1,14 +1,12 @@
-# fly.toml file generated for loanpro-api on 2022-11-13T19:00:01-09:00
+# fly.toml file generated for loanpro-api2 on 2022-11-14T15:45:00-09:00
 
 app = "loanpro-api"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
 
-[build]
-  image = "mrknutson/loanpro-api:latest"
-
 [env]
+  SECRET = "fd4s5a64fd654a6ds54te564tr6e5g46fd5a4fd6a46sd54f6sda"
 
 [experimental]
   allowed_public_ports = []
@@ -26,7 +24,7 @@ processes = []
     type = "connections"
 
   [[services.ports]]
-    force_https = true
+    force_https = false
     handlers = ["http"]
     port = 80
 
@@ -35,7 +33,7 @@ processes = []
     port = 443
 
   [[services.tcp_checks]]
-    grace_period = "1s"
-    interval = "15s"
+    grace_period = "5s"
+    interval = "30s"
     restart_limit = 0
-    timeout = "2s"
+    timeout = "10s"

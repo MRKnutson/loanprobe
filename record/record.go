@@ -71,7 +71,7 @@ func performOperation(operation string, firstNumber float64, secondNumber float6
 		operationResponse = fmt.Sprint(firstNumber * secondNumber)
 	case "Division":
 		operationResponse = fmt.Sprint(firstNumber / secondNumber)
-	case "Sqare_root":
+	case "Square_root":
 		operationResponse = fmt.Sprint(math.Sqrt(firstNumber))
 	case "Random_String":
 		operationResponse = generateStrings()

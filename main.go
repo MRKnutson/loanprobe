@@ -42,7 +42,7 @@ func enableCors(w *http.ResponseWriter) {
 }
 
 func initDatabase() {
-	dsn := "host=localhost user=postgres password=password dbname=loanpro port=5432 sslmode=disable"
+	dsn := os.Getenv("DATABASE_URL")
 	var err error
 	database.DBConn, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
